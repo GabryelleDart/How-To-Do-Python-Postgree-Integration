@@ -282,3 +282,207 @@ Depois de alterar, **é preciso reiniciar o serviço** para aplicar as mudanças
 ---
 
 ## Criar banco de dados e usuário para o projeto
+
+
+-----
+
+## 🔗 Conectar Python ao PostgreSQL e Executar Consultas
+
+Esta seção é o guia definitivo para a etapa final do nosso projeto: fazer a aplicação Python se conectar ao banco de dados, executar uma consulta real com `JOIN`s e exibir um relatório formatado.
+
+-----
+
+### 📝 Pré-requisitos Essenciais
+
+Antes de tocar em qualquer código Python, verifique se os seguintes pontos estão 100% corretos. A maioria dos erros acontece por problemas na base.
+
+  - ✅ **Servidor PostgreSQL Rodando:** Garanta que o serviço do PostgreSQL foi iniciado no seu computador.
+  - ✅ **Banco e Usuário Criados:** Você precisa ter executado os passos da seção anterior, criando o banco `petsaude_vca` e o usuário `petsaude_user`.
+  - ✅ **Permissões do Usuário Concedidas:** Este é um passo crítico. O usuário `petsaude_user` não tem permissão para nada por padrão. **Conecte-se como `postgres`** e execute o script abaixo para evitar o erro de `permissão negada`.
+
+<!-- end list -->
+
+```sql
+-- SCRIPT DE PERMISSÕES (Execute no DBeaver/pgAdmin como 'postgres')
+
+-- 1. Permite que o usuário acesse o esquema 'public'
+GRANT USAGE ON SCHEMA public TO petsaude_user;
+
+-- 2. Permite que o usuário leia TODAS as tabelas no esquema 'public'
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO petsaude_user;
+
+-- 3. Permite que o usuário escreva (INSERT, UPDATE, DELETE) nas tabelas de dados
+GRANT INSERT, UPDATE, DELETE ON tb_atendimento, tb_paciente, tb_unidade_saude TO petsaude_user;
+
+-- 4. Permite que o usuário use as sequências de ID automático (essencial para INSERTs)
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO petsaude_user;
+```
+
+-----
+
+### ⚙️ Passo 1: Configurando o Ambiente Python
+
+Agora, vamos preparar a "sala" onde nosso código Python vai rodar.
+
+1.  **Crie e Ative um Ambiente Virtual (`venv`)**
+    Isso cria uma instalação Python isolada para o projeto. No terminal, dentro da pasta do projeto:
+
+    ```bash
+    # 1. Criar o ambiente
+    python -m venv venv
+
+    # 2. Ativar o ambiente
+    # No Windows (PowerShell):
+    .\venv\Scripts\activate
+    # No Linux / macOS:
+    source venv/bin/activate
+    ```
+
+    > ✅ **Sucesso:** A linha do seu terminal agora começa com `(venv)`.
+
+2.  **Instale o Conector `psycopg2`**
+    Com o ambiente ativado, instale a biblioteca que faz a ponte entre Python e PostgreSQL:
+
+    ```bash
+    pip install psycopg2-binary
+    ```
+
+#### 🚨 Resolvendo o Erro de Política de Execução no PowerShell
+
+> Se ao tentar ativar o `venv` no Windows você receber um erro de **`UnauthorizedAccess`** ou **"execução de scripts foi desabilitada"**, isso é uma trava de segurança padrão.
+>
+> **Solução:**
+>
+> 1.  Abra o **PowerShell** como **Administrador**.
+> 2.  Execute o comando: `Set-ExecutionPolicy RemoteSigned`
+> 3.  Confirme digitando `S` e pressionando Enter.
+> 4.  Feche o PowerShell de administrador e tente ativar o `venv` novamente em um terminal normal.
+
+-----
+
+### 📄 Passo 2: O Script de Aplicação (`app.py`)
+
+Crie um arquivo `app.py` na raiz do projeto. Este código contém a lógica completa para conectar, buscar e formatar os dados.
+
+```python
+import psycopg2
+import psycopg2.extras
+
+# --- 1. CONFIGURAÇÕES DE CONEXÃO ---
+# ⚠️ ATENÇÃO: Verifique se todos os dados abaixo estão corretos!
+# O nome do banco, usuário e principalmente a SENHA.
+DB_CONFIG = {
+    "host": "localhost",
+    "port": "5432",
+    "dbname": "petsaude_vca",
+    "user": "petsaude_user",
+    "password": "uma_senha_bem_forte_aqui" # <-- TROQUE PELA SENHA QUE VOCÊ CRIOU! (no nosso caso foi P3t-S4ud3)
+}
+
+# --- 2. CONSULTA SQL COM JUNÇÕES (JOINS) ---
+RELATORIO_ATENDIMENTOS_QUERY = """
+SELECT
+    p.no_paciente,
+    s.ds_sexo,
+    EXTRACT(YEAR FROM AGE(p.dt_nascimento)) AS idade,
+    u.no_unidade,
+    a.dt_atendimento,
+    a.ds_resumo_atendimento
+FROM
+    tb_atendimento AS a
+JOIN
+    tb_paciente AS p ON a.co_paciente = p.co_seq_paciente
+JOIN
+    tb_unidade_saude AS u ON a.co_unidade_saude = u.co_seq_unidade_saude
+JOIN
+    dim_sexo AS s ON p.co_sexo = s.co_seq_sexo
+WHERE
+    u.no_unidade = %s -- Placeholder para a busca segura
+ORDER BY
+    a.dt_atendimento DESC;
+"""
+
+# --- 3. FUNÇÃO PRINCIPAL ---
+def gerar_relatorio_por_unidade(nome_unidade):
+    """Conecta ao banco, executa a consulta e exibe os resultados."""
+    conn = None
+    try:
+        print(f"Conectando ao banco de dados '{DB_CONFIG['dbname']}'...")
+        conn = psycopg2.connect(**DB_CONFIG)
+        print("Conexão bem-sucedida!")
+
+        # O RealDictCursor permite acessar os resultados pelo nome da coluna (ex: resultado['no_paciente'])
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        print(f"\nBuscando atendimentos para a unidade: '{nome_unidade}'...")
+        # A vírgula em (nome_unidade,) é essencial para criar uma tupla de um único elemento
+        cur.execute(RELATORIO_ATENDIMENTOS_QUERY, (nome_unidade,))
+        resultados = cur.fetchall()
+        cur.close()
+
+        if not resultados:
+            print("Nenhum atendimento encontrado para esta unidade.")
+            return
+
+        print(f"\n--- RELATÓRIO DE ATENDIMENTOS: {nome_unidade} ---")
+        for atendimento in resultados:
+            print(f"Paciente: {atendimento['no_paciente']} (Idade: {int(atendimento['idade'])}, Sexo: {atendimento['ds_sexo']})")
+            print(f"Data: {atendimento['dt_atendimento'].strftime('%d/%m/%Y %H:%M')}")
+            print(f"Resumo: {atendimento['ds_resumo_atendimento']}")
+            print("-" * 40)
+        
+        print(f"Total de {len(resultados)} atendimentos encontrados.")
+
+    except psycopg2.Error as e:
+        print(f"\n❌ Erro ao interagir com o PostgreSQL: {e}")
+
+    finally:
+        if conn is not None:
+            conn.close()
+            print("\nConexão com o banco de dados fechada.")
+
+# --- 4. PONTO DE ENTRADA DO SCRIPT ---
+if __name__ == "__main__":
+    # Defina aqui qual unidade de saúde você quer pesquisar
+    unidade_de_saude_alvo = "UBS Dr. Régis Pacheco"
+    gerar_relatorio_por_unidade(unidade_de_saude_alvo)
+```
+
+-----
+
+### ▶️ Passo 3: Executando e Vendo o Resultado
+
+Com tudo pronto, a execução é o passo final.
+
+1.  **Verifique sua Posição:** Certifique-se de que seu terminal está na pasta raiz do projeto (ex: `PET SAUDE`).
+2.  **Verifique o Ambiente:** Garanta que o `(venv)` está ativado.
+3.  **Execute o Script:**
+    ```bash
+    python app.py
+    ```
+
+O resultado esperado é o relatório completo impresso no seu terminal, provando que a integração foi um sucesso\! 🎉
+
+```bash
+(venv) PS C:\Users\joaoh\OneDrive\Documentos\PET SAUDE> python app.py
+Conectando ao banco de dados 'petsaude_vca'...
+Conexão bem-sucedida!
+
+Buscando atendimentos para a unidade: 'UBS Dr. Régis Pacheco'...
+
+--- RELATÓRIO DE ATENDIMENTOS: UBS Dr. Régis Pacheco ---
+Paciente: Ana Clara Guimarães (Idade: 30, Sexo: Feminino)
+Data: 09/09/2025 22:03
+Resumo: Retorno para mostrar exames. Resultados normais. Aconselhada a manter dieta equilibrada.
+----------------------------------------
+Paciente: Ana Clara Guimarães (Idade: 30, Sexo: Feminino)
+Data: 09/09/2025 22:03
+Resumo: Consulta de rotina. Paciente relata bom estado de saúde geral. Aferida pressão arterial: 120/80 mmHg.
+----------------------------------------
+Total de 2 atendimentos encontrados.
+
+Conexão com o banco de dados fechada.
+```
+
+
+
