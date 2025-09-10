@@ -162,6 +162,7 @@ O PostgreSQL utiliza um arquivo chamado **`pg_hba.conf`** (Host-Based Authentica
 3. Como se autenticar (senha, certificado, trust sem senha etc).
 
 ### 🛡️ Configuração Recomendada para Acesso Local
+
 1. Localize o arquivo **`pg_hba.conf`**
   #### Windows
   
@@ -270,29 +271,14 @@ local   all     all               md5
 
 Depois de alterar, **é preciso reiniciar o serviço** para aplicar as mudanças.
 
-### 💻 Windows
+### 🔐 Configuração da Senha
 
-1. O PostgreSQL já cria um usuário administrador chamado `postgres`.  
-2. Durante a instalação, você já **definiu a senha do `postgres`**.  
+| Sistema Operacional | Usuário Padrão | Configuração de Senha | Comandos |
+|---------------------|----------------|------------------------|----------|
+| **🪟 Windows** | `postgres` | Definida durante a instalação | *Senha configurada no processo de instalação* |
+| **🐧 Linux** | `postgres` (usuário do sistema) | Deve ser definida manualmente | ```bash<br>sudo -i -u postgres<br>psql<br>\password postgres<br>``` |
+| **🍎 macOS** | Mesmo usuário do sistema | Acesso sem senha por padrão | ```bash<br>psql<br>CREATE USER meu_usuario <br>WITH PASSWORD 'minha_senha';<br>``` |
 
-## 🐧 Linux (Ubuntu/Debian)
-
-1. O PostgreSQL cria o usuário do sistema `postgres`.  
-2. Para definir uma senha do administrador:
-```bash
-sudo -i -u postgres
-psql
-\password postgres
-```
-###🍎 macOS
-
-1. Por padrão, o usuário administrador é o mesmo do sistema e pode acessar sem senha.
-2. Para criar um acesso seguro, crie um usuário com senha:
-```bash
-   psql
-CREATE USER meu_usuario WITH PASSWORD 'minha_senha';
-```
-#### baasb
 ---
 
 ## Criar banco de dados e usuário para o projeto
