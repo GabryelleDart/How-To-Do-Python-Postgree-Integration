@@ -276,8 +276,8 @@ Depois de alterar, **é preciso reiniciar o serviço** para aplicar as mudanças
 | Sistema Operacional | Usuário Padrão | Configuração de Senha | Comandos |
 |---------------------|----------------|------------------------|----------|
 | **🪟 Windows** | `postgres` | Definida durante a instalação | *Senha configurada no processo de instalação* |
-| **🐧 Linux** | `postgres` (usuário do sistema) | Deve ser definida manualmente | ```bash<br>sudo -i -u postgres<br>psql<br>\password postgres<br>``` |
-| **🍎 macOS** | Mesmo usuário do sistema | Acesso sem senha por padrão | ```bash<br>psql<br>CREATE USER meu_usuario <br>WITH PASSWORD 'minha_senha';<br>``` |
+| **🐧 Linux** | `postgres` (usuário do sistema) | Deve ser definida manualmente | ```sudo -i -u postgres psql \password postgres``` |
+| **🍎 macOS** | Mesmo usuário do sistema | Acesso sem senha por padrão | ```psql CREATE USER meu_usuario WITH PASSWORD 'minha_senha';``` |
 
 ---
 
