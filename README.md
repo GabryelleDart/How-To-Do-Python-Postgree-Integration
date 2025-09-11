@@ -142,6 +142,26 @@ psql --version
  psql --version
    ```
 -------------
+
+
+
+
+
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+
+
+
+
+
+
+
+
+
 ## Configurar o PostgreSQL para acesso local seguro
 ### 📝 O que é “Acesso Local Seguro”?
 
@@ -281,6 +301,23 @@ Depois de alterar, **é preciso reiniciar o serviço** para aplicar as mudanças
 
 ---
 
+
+
+
+
+
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+
+
+
+
+
+
 ## 🗃️ Criar banco de dados e usuário para o projeto
 
 ### 🔎 O que é isso e por que é importante?
@@ -372,6 +409,21 @@ GRANT ALL PRIVILEGES ON DATABASE meu_projeto TO meu_usuario;
 <img width="1915" height="1002" alt="image" src="https://github.com/user-attachments/assets/192a612d-8526-4204-8819-21b8d77b4fa3" />
 
 ---
+
+
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+
+
+
+
+
+
+
 
 
 ## 📐 Definir Entidades e Atributos do Banco de Dados
@@ -531,6 +583,21 @@ CREATE TABLE tb_atendimento (
    | Windows | `psql -U meu_usuario -d meu_projeto -f "C:\caminho\para\schema.sql"` |
 ---
 
+
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+
+
+
+
+
+
+
+
 ## 🗂️ Modelar Relações entre as Tabelas no PostgreSQL
 
 ### 📖 O que significa modelar relações?
@@ -613,9 +680,41 @@ Clique em Generate SQL → Run para aplicar no banco.
 📌 Vantagem: Muito bom para quem prefere trabalhar visualmente.
 📌 Desvantagem: Menos controle fino do que escrever SQL diretamente.
 ----
-## 🗂️ Modelar Relações entre as Tabelas no PostgreSQL
+
+
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+
+
+
+
+
+
+
+
+## 🗂️ Criar o esquema do Banco de Dados
 
 --
+
+
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+
+
+
+
+
+
+
+
 ## 🚀 Escrever e Executar Queries (Consultas) no Banco de Dados
 
 Com nosso banco de dados, tabelas e usuários devidamente estruturados, o próximo passo é interagir com os dados. Esta seção cobre as operações essenciais de um banco de dados: Inserir, Atualizar, Remover e, o mais importante, Consultar informações.
