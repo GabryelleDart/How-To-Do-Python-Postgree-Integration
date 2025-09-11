@@ -370,7 +370,132 @@ GRANT ALL PRIVILEGES ON DATABASE meu_projeto TO meu_usuario;
 <img width="1919" height="1011" alt="image" src="https://github.com/user-attachments/assets/d45e250f-60cf-4d47-a40a-6feb3dc0a427" />
 
 <img width="1915" height="1002" alt="image" src="https://github.com/user-attachments/assets/192a612d-8526-4204-8819-21b8d77b4fa3" />
+-----
+## 📐 Definir Entidades e Atributos do Banco de Dados
 
+### 🔎 O que são **entidades**?
+
+- **Entidades** são os "objetos" ou "coisas" que queremos representar no banco de dados.  
+- Podem ser **pessoas, lugares, objetos, eventos ou conceitos** relevantes para o projeto.
+  
+### 👨‍⚕️ Exemplo prático para Sistema de Saúde:
+Em um sistema de gestão hospitalar, algumas entidades podem ser:
+- Paciente
+- Médico
+- Consulta
+- Prontuário
+- Exame
+- Medicamento
+### 🔑 O que são **atributos**?
+
+- **Atributos** são as **características** ou **informações** de cada entidade.  
+- Eles funcionam como colunas de uma tabela. 
+> **👨‍⚕️Exemplo no Contexto de Saúde:** Se a entidade é Paciente, seus atributos podem ser nome, data_nascimento, CPF, CNS, telefone, tipo_sanguineo.
+
+### 🧩 Modelagem de Banco de Dados: Conceitual, Lógico e Físico
+
+Antes de criar as entidades e atributos no PostgreSQL, precisamos entender **como planejar o banco de dados**.  
+Esse planejamento é feito em **três níveis de modelagem**:
+#### 1️⃣ Modelo Conceitual
+- **O que é**: visão mais **abstrata**, mostrando **quais entidades existem** e como se relacionam.
+- **Ferramenta típica**: diagrama ER (Entidade-Relacionamento).
+
+📌 **Exemplo:**
+- Entidades :
+  - **Cidadão** (dados demográficos, endereço, contato)
+  - **Equipe de Saúde** (equipe responsável pelo cidadão)
+  - **Raça/Cor** (classificação demográfica)
+  - **Sexo** (cadastro do sexo do cidadão)
+  - **Medição** (peso, altura, pressão, IMC, etc.)
+  - **Exame** (colesterol total, outros exames)
+  - **Evolução/Objetivo de Atendimento**
+ 
+ - Relações:
+  - Um **Cidadão** é **vinculado** a uma **Equipe de Saúde**.  
+  - Um **Cidadão** possui um registro de **Sexo** e **Raça/Cor**.  
+  - Um **Cidadão** pode ter **diversas medições** ao longo do tempo.  
+  - Um **Cidadão** pode ter **exames laboratoriais** (ex.: colesterol).  
+  - Um **Atendimento** gera uma **Evolução/Objetivo** registrado pelo profissional.
+
+> 👉 O modelo conceitual é para **entender o que existe** no sistema, sem pensar ainda em tabelas ou SQL.
+
+#### 2️⃣ Modelo Lógico
+
+- **O que é**: tradução do conceitual para tabelas e atributos, mas ainda sem detalhes técnicos de PostgreSQL.  
+- **Objetivo**: organizar **entidades, atributos, chaves primárias e estrangeiras**.
+  
+📌 Representação lógica:
+<img width="828" height="498" alt="diagrama lógico pet saúde" src="https://github.com/user-attachments/assets/542f7d3f-42f0-410f-8792-6475f61eccee" />
+
+>👉 O modelo lógico mostra **como os dados se conectam**, mas ainda não escolhemos detalhes técnicos do PostgreSQL.
+
+#### 3️⃣ Modelo Físico
+- **O que é**: é a versão **implementável** no banco real (PostgreSQL).  
+- **Objetivo**: definir **tipos de dados, constraints, índices, chaves**.
+
+>👉 O modelo físico é o que o PostgreSQL entende e executa.
+
+### 💻 Como definir entidades e atributos no PostgreSQL
+Existem várias formas de criar isso no PostgreSQL.  
+#### 1️⃣ Usando SQL direto (CREATE TABLE)
+```sql
+CREATE TABLE dim_tipo_unidade (
+    co_seq_tipo_unidade BIGSERIAL PRIMARY KEY,
+    ds_tipo_unidade VARCHAR(100) UNIQUE NOT NULL
+);
+
+CREATE TABLE dim_sexo (
+    co_seq_sexo BIGSERIAL PRIMARY KEY,
+    ds_sexo VARCHAR(50) UNIQUE NOT NULL,
+    sg_sexo CHAR(1)
+);
+CREATE TABLE tb_unidade_saude (
+    co_seq_unidade_saude BIGSERIAL PRIMARY KEY,
+    no_unidade VARCHAR(255) NOT NULL,
+    ds_endereco TEXT,
+    nu_cnes VARCHAR(20) UNIQUE,
+    co_tipo_unidade BIGINT NOT NULL,
+
+    CONSTRAINT fk_tipo_unidade
+        FOREIGN KEY(co_tipo_unidade) 
+        REFERENCES dim_tipo_unidade(co_seq_tipo_unidade)
+);
+
+CREATE TABLE tb_paciente (
+    co_seq_paciente BIGSERIAL PRIMARY KEY,
+    no_paciente VARCHAR(255) NOT NULL,
+    no_social_paciente VARCHAR(255),
+    dt_nascimento DATE NOT NULL,
+    nu_cpf VARCHAR(11) UNIQUE NOT NULL,
+    nu_cns VARCHAR(16) UNIQUE,
+    co_sexo BIGINT,
+    
+    CONSTRAINT fk_sexo
+        FOREIGN KEY(co_sexo) 
+        REFERENCES dim_sexo(co_seq_sexo)
+);
+CREATE TABLE tb_atendimento (
+    co_seq_atendimento BIGSERIAL PRIMARY KEY,
+    dt_atendimento TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    ds_resumo_atendimento TEXT,
+    co_paciente BIGINT NOT NULL,
+    co_unidade_saude BIGINT NOT NULL,
+
+    -- Define a relação com a tabela de pacientes
+    -- ON DELETE CASCADE: Se um paciente for deletado, todos os seus atendimentos também serão.
+    CONSTRAINT fk_paciente
+        FOREIGN KEY(co_paciente) 
+        REFERENCES tb_paciente(co_seq_paciente) ON DELETE CASCADE,
+
+    -- Define a relação com a tabela de unidades de saúde
+    CONSTRAINT fk_unidade_saude
+        FOREIGN KEY(co_unidade_saude) 
+        REFERENCES tb_unidade_saude(co_seq_unidade_saude) ON DELETE CASCADE
+);
+````
+#### 2️⃣ Usando pgAdmin (interface gráfica)
+#### 3️⃣ Usando Scripts SQL (para rodar várias vezes)
+-----
 
 ## 🚀 Escrever e Executar Queries (Consultas) no Banco de Dados
 
