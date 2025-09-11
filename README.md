@@ -370,7 +370,10 @@ GRANT ALL PRIVILEGES ON DATABASE meu_projeto TO meu_usuario;
 <img width="1919" height="1011" alt="image" src="https://github.com/user-attachments/assets/d45e250f-60cf-4d47-a40a-6feb3dc0a427" />
 
 <img width="1915" height="1002" alt="image" src="https://github.com/user-attachments/assets/192a612d-8526-4204-8819-21b8d77b4fa3" />
------
+
+---
+
+
 ## 📐 Definir Entidades e Atributos do Banco de Dados
 
 ### 🔎 O que são **entidades**?
@@ -439,62 +442,92 @@ Esse planejamento é feito em **três níveis de modelagem**:
 Existem várias formas de criar isso no PostgreSQL.  
 #### 1️⃣ Usando SQL direto (CREATE TABLE)
 ```sql
+-- Tabela de tipos de unidade (dimensão)
 CREATE TABLE dim_tipo_unidade (
-    co_seq_tipo_unidade BIGSERIAL PRIMARY KEY,
-    ds_tipo_unidade VARCHAR(100) UNIQUE NOT NULL
+    co_seq_tipo_unidade BIGSERIAL PRIMARY KEY,   -- Identificador único
+    ds_tipo_unidade VARCHAR(100) UNIQUE NOT NULL -- Nome do tipo da unidade (ex: Hospital, UBS)
 );
 
+-- Tabela de sexos (dimensão)
 CREATE TABLE dim_sexo (
-    co_seq_sexo BIGSERIAL PRIMARY KEY,
-    ds_sexo VARCHAR(50) UNIQUE NOT NULL,
-    sg_sexo CHAR(1)
+    co_seq_sexo BIGSERIAL PRIMARY KEY,   -- Identificador único
+    ds_sexo VARCHAR(50) UNIQUE NOT NULL, -- Masculino, Feminino, Outro
+    sg_sexo CHAR(1)                      -- Sigla (M, F, O)
 );
+
+-- Tabela de unidades de saúde
 CREATE TABLE tb_unidade_saude (
     co_seq_unidade_saude BIGSERIAL PRIMARY KEY,
-    no_unidade VARCHAR(255) NOT NULL,
-    ds_endereco TEXT,
-    nu_cnes VARCHAR(20) UNIQUE,
-    co_tipo_unidade BIGINT NOT NULL,
+    no_unidade VARCHAR(255) NOT NULL,   -- Nome da unidade
+    ds_endereco TEXT,                   -- Endereço completo
+    nu_cnes VARCHAR(20) UNIQUE,         -- Código CNES da unidade
+    co_tipo_unidade BIGINT NOT NULL,    -- Relaciona com a tabela de tipos de unidade
 
     CONSTRAINT fk_tipo_unidade
         FOREIGN KEY(co_tipo_unidade) 
-        REFERENCES dim_tipo_unidade(co_seq_tipo_unidade)
+        REFERENCES dim_tipo_unidade(co_seq_tipo_unidade) -- Chave estrangeira
 );
 
+-- Tabela de pacientes
 CREATE TABLE tb_paciente (
     co_seq_paciente BIGSERIAL PRIMARY KEY,
-    no_paciente VARCHAR(255) NOT NULL,
-    no_social_paciente VARCHAR(255),
-    dt_nascimento DATE NOT NULL,
-    nu_cpf VARCHAR(11) UNIQUE NOT NULL,
-    nu_cns VARCHAR(16) UNIQUE,
-    co_sexo BIGINT,
+    no_paciente VARCHAR(255) NOT NULL,      -- Nome completo
+    no_social_paciente VARCHAR(255),        -- Nome social
+    dt_nascimento DATE NOT NULL,            -- Data de nascimento
+    nu_cpf VARCHAR(11) UNIQUE NOT NULL,     -- CPF
+    nu_cns VARCHAR(16) UNIQUE,              -- Cartão SUS
+    co_sexo BIGINT,                         -- Relaciona com a tabela de sexo
     
     CONSTRAINT fk_sexo
         FOREIGN KEY(co_sexo) 
         REFERENCES dim_sexo(co_seq_sexo)
 );
+
+-- Tabela de atendimentos
 CREATE TABLE tb_atendimento (
     co_seq_atendimento BIGSERIAL PRIMARY KEY,
-    dt_atendimento TIMESTAMP WITH TIME ZONE DEFAULT now(),
-    ds_resumo_atendimento TEXT,
-    co_paciente BIGINT NOT NULL,
-    co_unidade_saude BIGINT NOT NULL,
+    dt_atendimento TIMESTAMP WITH TIME ZONE DEFAULT now(), -- Data e hora do atendimento
+    ds_resumo_atendimento TEXT,                            -- Resumo da consulta
+    co_paciente BIGINT NOT NULL,                           -- Relaciona com paciente
+    co_unidade_saude BIGINT NOT NULL,                      -- Relaciona com unidade de saúde
 
-    -- Define a relação com a tabela de pacientes
-    -- ON DELETE CASCADE: Se um paciente for deletado, todos os seus atendimentos também serão.
+    -- Relaciona com paciente (se o paciente for deletado, seus atendimentos também serão)
     CONSTRAINT fk_paciente
         FOREIGN KEY(co_paciente) 
         REFERENCES tb_paciente(co_seq_paciente) ON DELETE CASCADE,
 
-    -- Define a relação com a tabela de unidades de saúde
+    -- Relaciona com unidade de saúde (mesma lógica do paciente)
     CONSTRAINT fk_unidade_saude
         FOREIGN KEY(co_unidade_saude) 
         REFERENCES tb_unidade_saude(co_seq_unidade_saude) ON DELETE CASCADE
 );
 ````
+>👉 Cada CREATE TABLE cria uma entidade (tabela).
+>👉 Cada linha dentro da tabela define um atributo (coluna).
+>👉 As chaves estrangeiras (FOREIGN KEY) criam relações entre as entidades.
+
+> ‼️ Caso houver estranhamento acerca das nomeclaturas utilizadas, acesse o documento :
 #### 2️⃣ Usando pgAdmin (interface gráfica)
+   1. Abra o pgAdmin.
+   2. Clique em Databases → Seu banco → Schemas → Tables.
+   3. Clique com o botão direito → Create → Table.
+<img width="1919" height="1016" alt="Captura de tela 2025-09-11 172908" src="https://github.com/user-attachments/assets/69614482-754b-4a86-9b4b-aea3e2c62707" />
+   4. Defina o nome da entidade (ex: tb_paciente).
+<img width="1919" height="1006" alt="Captura de tela 2025-09-11 173226" src="https://github.com/user-attachments/assets/bf53a0a9-444d-4f76-9236-b6e6e9b8f43b" />
+   5. Em Columns, adicione os atributos (colunas, tipo de dado, se é obrigatório, se é chave primária).
+<img width="1919" height="997" alt="Captura de tela 2025-09-11 173357" src="https://github.com/user-attachments/assets/12cc2522-09e7-4250-8656-4636ee071a3e" />
+   6. Salve.
+
+> Método ideal para quem prefere clicar em menus em vez de digitar comandos.
 #### 3️⃣ Usando Scripts SQL (para rodar várias vezes)
+   1. Crie um arquivo chamado `schema.sql`.
+   2. Cole dentro dele o mesmo código mostrado em  `Usando SQL direto (CREATE TABLE)`.
+   3. Execute o script no terminal:
+
+   | Sistema Operacional | Comando |
+   |---------------------|---------|
+   | Linux/macOS | `psql -U meu_usuario -d meu_projeto -f schema.sql` |
+   | Windows | `psql -U meu_usuario -d meu_projeto -f "C:\caminho\para\schema.sql"` |
 -----
 
 ## 🚀 Escrever e Executar Queries (Consultas) no Banco de Dados
