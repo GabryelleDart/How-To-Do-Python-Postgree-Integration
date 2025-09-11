@@ -114,11 +114,11 @@ psql --version
 ```bash
   sudo systemctl status postgresql
    ```
--Iniciar: sudo systemctl start postgresql
+- Iniciar: sudo systemctl start postgresql
 
--Parar: sudo systemctl stop postgresql
+- Parar: sudo systemctl stop postgresql
 
--Reiniciar: sudo systemctl restart postgresql
+- Reiniciar: sudo systemctl restart postgresql
 
 ###  🍎 Instalação no macOS
 
@@ -164,7 +164,7 @@ O PostgreSQL utiliza um arquivo chamado **`pg_hba.conf`** (Host-Based Authentica
 ### 🛡️ Configuração Recomendada para Acesso Local
 
 1. Localize o arquivo **`pg_hba.conf`**
-  #### Windows
+  #### 💻 Windows
   
    - Método 1 - Via linha de comando do PostgreSQL
    ```
@@ -178,7 +178,7 @@ O PostgreSQL utiliza um arquivo chamado **`pg_hba.conf`** (Host-Based Authentica
   ```
   Get-ChildItem -Path C:\ -Name pg_hba.conf -Recurse -ErrorAction SilentlyContinue
   ```
-  #### Linux
+  #### 🐧 Linux
    - Método 1 - Via linha de comando do PostgreSQL
    ```
    sudo -u postgres psql -c "SHOW hba_file;"
@@ -193,7 +193,7 @@ O PostgreSQL utiliza um arquivo chamado **`pg_hba.conf`** (Host-Based Authentica
   ```
   sudo find / -name pg_hba.conf 2>/dev/null
   ```
-  #### macOS(Homebrew)
+  #### 🍎 macOS(Homebrew)
   - Método 1 - Comando do PostgreSQL
    ```
    psql -c "SHOW hba_file;"
