@@ -281,9 +281,96 @@ Depois de alterar, **é preciso reiniciar o serviço** para aplicar as mudanças
 
 ---
 
-## Criar banco de dados e usuário para o projeto
+## 🗃️ Criar banco de dados e usuário para o projeto
 
------
+### 🔎 O que é isso e por que é importante?
+- **Banco de dados**: é o lugar onde sua aplicação guarda informações, como uma super planilha inteligente.  
+- **Usuário**: é a conta que acessa o banco.  
+- **Por que criar um usuário separado para o projeto?**
+  - Segurança: não use a conta de administrador (`postgres`) no dia a dia.  
+  - Organização: cada projeto com seu banco e usuário.  
+  - Controle: você decide quem pode ver ou mudar dados.
+ 
+### 💻 Métodos de criar banco e usuário
+
+Você pode fazer isso de várias formas, dependendo do seu sistema ou preferência: **linha de comando, script SQL, GUI, Docker**.
+```
+Obs: Docker não será abordado nesse README pois não fez parte do escopo de estudo da Sprint, mas deixamos como informação adicional para possiveis pesquisas futuras.
+```
+#### 1️⃣ Linha de comando (`psql`) — Windows, Linux e macOS
+
+**Passo 1:** Conectar como administrador  
+
+- **Windows**:
+```bash
+psql -U postgres -h localhost -W
+```
+- **Linux**:
+```bash
+sudo -i -u postgres
+psql
+```
+- **macOS**:
+```bash
+psql
+```
+**Passo 2:** Criar usuário e senha
+```bash
+CREATE USER meu_usuario WITH PASSWORD 'minha_senha_segura';
+```
+**Passo 3:** Criar banco e definir o dono
+```bash
+CREATE DATABASE meu_projeto OWNER meu_usuario;
+```
+**Passo 4:** Dar permissões básicas
+```bash
+GRANT ALL PRIVILEGES ON DATABASE meu_projeto TO meu_usuario;
+```
+> OBS: Você pode conceder só as permissões que o usuário precisa.
+> 
+#### 2️⃣ Usando script SQL (arquivo .sql)
+
+**Passo 1:**  Crie um arquivo chamado setup.sql:
+```bash
+CREATE USER meu_usuario WITH PASSWORD 'minha_senha_segura';
+CREATE DATABASE meu_projeto OWNER meu_usuario;
+GRANT ALL PRIVILEGES ON DATABASE meu_projeto TO meu_usuario;
+```
+**Passo 1:** Execute o script:
+| Sistema Operacional | Comando |
+|---------------------|---------|
+| Linux | `sudo -u postgres psql -f setup.sql` |
+| Windows/macOS | `psql -U postgres -f setup.sql` |
+
+#### 3️⃣ Usando GUI (Interface Gráfica)/
+> Nessa explicação será demonstrado com **pgAdmin**, a interface gráfica do Postgre.
+
+**Passo 1:**  Abra a ferramenta e conecte-se como postgres.
+   
+<img width="1919" height="1020" alt="Captura de tela 2025-09-11 152753" src="https://github.com/user-attachments/assets/edfdc68f-8bef-40fb-88f3-7a0ef0e75859" />
+
+**Passo 2:** Crie um usuário com senha (Login/Role) e ajuste permissões conforme necessário.
+   
+<img width="1919" height="1018" alt="Captura de tela 2025-09-11 152809" src="https://github.com/user-attachments/assets/608ae725-3190-41d7-8f2e-4f369c48ebc4" />
+
+<img width="1919" height="1010" alt="Captura de tela 2025-09-11 152855" src="https://github.com/user-attachments/assets/ff8a383f-a18b-4711-95a6-8ff834a9ea82" />
+
+<img width="1919" height="1014" alt="Captura de tela 2025-09-11 153207" src="https://github.com/user-attachments/assets/c6f9c80c-c8ff-47bd-91af-59c57209de27" />
+
+> Ao não preencher o **Account expires** a conta da *maria* não terá uma data de validade.
+> Ao deixar **Connection limit** em -1 , estou dizendo ao sistema que a conta não terá limite de conexão.
+
+<img width="1919" height="1016" alt="Captura de tela 2025-09-11 153230" src="https://github.com/user-attachments/assets/2332ad04-7746-4488-98fb-10b2bae56ecf" />
+
+**Passo 3:**  Crie um banco de dados e defina esse usuário como dono.
+<img width="1910" height="963" alt="Captura de tela 2025-09-11 153737" src="https://github.com/user-attachments/assets/b2695837-e76d-43e2-9f90-7bb639e14653" />
+
+<img width="1919" height="544" alt="image" src="https://github.com/user-attachments/assets/6391d476-2f5f-48ea-8950-700f81247fe7" />
+
+<img width="1919" height="1011" alt="image" src="https://github.com/user-attachments/assets/d45e250f-60cf-4d47-a40a-6feb3dc0a427" />
+
+<img width="1915" height="1002" alt="image" src="https://github.com/user-attachments/assets/192a612d-8526-4204-8819-21b8d77b4fa3" />
+
 
 ## 🚀 Escrever e Executar Queries (Consultas) no Banco de Dados
 
