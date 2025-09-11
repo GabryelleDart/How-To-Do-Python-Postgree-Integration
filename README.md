@@ -208,7 +208,7 @@ O PostgreSQL utiliza um arquivo chamado **`pg_hba.conf`** (Host-Based Authentica
   sudo find / -name pg_hba.conf 2>/dev/null | grep -v Permission
   ```
 2. Edite o arquivo pg_hba.conf
- #### Windows
+ #### 💻 Windows
    - Método 1 - Bloco de Notas como administrador
     ```
    notepad "C:\Program Files\PostgreSQL\15\data\pg_hba.conf"
@@ -222,7 +222,7 @@ O PostgreSQL utiliza um arquivo chamado **`pg_hba.conf`** (Host-Based Authentica
     ```
    code "C:\Program Files\PostgreSQL\15\data\pg_hba.conf"
     ```
-#### Linux
+#### 🐧 Linux
    - Método 1 - Nano (sudo necessário)
    ```
    sudo nano /etc/postgresql/15/main/pg_hba.conf
@@ -243,7 +243,7 @@ O PostgreSQL utiliza um arquivo chamado **`pg_hba.conf`** (Host-Based Authentica
    ```
    sudo cat /etc/postgresql/15/main/pg_hba.conf
    ```
-#### macOS(Homebrew)
+#### 🍎 macOS(Homebrew)
    - Método 1 - Nano
    ```
    sudo nano /usr/local/var/postgres/pg_hba.conf
@@ -519,6 +519,7 @@ CREATE TABLE tb_atendimento (
    6. Salve.
 
 > Método ideal para quem prefere clicar em menus em vez de digitar comandos.
+> 
 #### 3️⃣ Usando Scripts SQL (para rodar várias vezes)
    1. Crie um arquivo chamado `schema.sql`.
    2. Cole dentro dele o mesmo código mostrado em  `Usando SQL direto (CREATE TABLE)`.
@@ -528,8 +529,93 @@ CREATE TABLE tb_atendimento (
    |---------------------|---------|
    | Linux/macOS | `psql -U meu_usuario -d meu_projeto -f schema.sql` |
    | Windows | `psql -U meu_usuario -d meu_projeto -f "C:\caminho\para\schema.sql"` |
------
+---
 
+## 🗂️ Modelar Relações entre as Tabelas no PostgreSQL
+
+### 📖 O que significa modelar relações?
+
+### 🧩 Tipos de Relacionamentos
+### 📊 Métodos para modelar relações
+
+####🔹 1. Via SQL (padrão e mais usado)
+
+O jeito mais direto é escrever os comandos SQL que criam as chaves estrangeiras (FOREIGN KEYS).
+Exemplo:
+```sql
+-- Criar tabela de tipos de unidade
+CREATE TABLE dim_tipo_unidade (
+    co_seq_tipo_unidade BIGSERIAL PRIMARY KEY,
+    ds_tipo_unidade VARCHAR(100) UNIQUE NOT NULL
+);
+
+-- Criar tabela de unidades de saúde e ligar ao tipo
+CREATE TABLE tb_unidade_saude (
+    co_seq_unidade_saude BIGSERIAL PRIMARY KEY,
+    no_unidade VARCHAR(255) NOT NULL,
+    co_tipo_unidade BIGINT NOT NULL,
+
+    CONSTRAINT fk_tipo_unidade
+        FOREIGN KEY(co_tipo_unidade) 
+        REFERENCES dim_tipo_unidade(co_seq_tipo_unidade)
+);
+```
+> 👉 Aqui, a relação é 1 tipo de unidade → várias unidades de saúde (1:N).
+** 📌 Vantagem: mais flexível, você escreve exatamente o que precisa.**
+** 📌 Desvantagem: precisa conhecer SQL.**
+
+####🔹 2. Usando pgAdmin (Interface Gráfica)
+
+1. Abra o pgAdmin e conecte ao seu banco de dados.
+
+2. No painel lateral, vá até Schemas → Tables.
+
+Clique com o botão direito na tabela que vai receber a chave estrangeira (ex.: tb_unidade_saude).
+
+Selecione Properties → Constraints → Foreign Keys.
+
+Clique em + para adicionar uma nova foreign key.
+
+Configure:
+
+Nome da constraint (ex.: fk_tipo_unidade)
+
+Coluna da tabela atual (ex.: co_tipo_unidade)
+
+Tabela de referência (ex.: dim_tipo_unidade)
+
+Coluna de referência (ex.: co_seq_tipo_unidade)
+
+Clique em Save.
+
+**📌 O pgAdmin vai gerar automaticamente o comando SQL equivalente.**
+
+####🔹 3. Usando Diagramas ERD no pgAdmin
+
+O pgAdmin tem uma ferramenta chamada ERD Tool (Entity-Relationship Diagram), que permite criar relações arrastando e soltando.
+
+Como usar:
+
+Abra o pgAdmin.
+
+Vá em Tools → ERD Tool.
+
+Adicione as tabelas que já existem no banco.
+
+Clique em uma coluna e arraste até a coluna da tabela relacionada.
+
+Exemplo: arraste co_tipo_unidade de tb_unidade_saude até co_seq_tipo_unidade de dim_tipo_unidade.
+
+O pgAdmin gera o relacionamento visualmente e o SQL correspondente.
+
+Clique em Generate SQL → Run para aplicar no banco.
+
+📌 Vantagem: Muito bom para quem prefere trabalhar visualmente.
+📌 Desvantagem: Menos controle fino do que escrever SQL diretamente.
+----
+## 🗂️ Modelar Relações entre as Tabelas no PostgreSQL
+
+--
 ## 🚀 Escrever e Executar Queries (Consultas) no Banco de Dados
 
 Com nosso banco de dados, tabelas e usuários devidamente estruturados, o próximo passo é interagir com os dados. Esta seção cobre as operações essenciais de um banco de dados: Inserir, Atualizar, Remover e, o mais importante, Consultar informações.
