@@ -816,7 +816,7 @@ Com nosso banco de dados, tabelas e usuários devidamente estruturados, o próxi
 
 As queries a seguir devem ser executadas em uma ferramenta de banco de dados como **DBeaver** ou **pgAdmin**, conectado ao banco `petsaude_vca` com o usuário `petsaude_user`.
 
-#### 🔵 PSDN-34: Inserção, Atualização e Remoção (DML)
+#### 🔵 Inserção, Atualização e Remoção (DML)
 
 ##### 1\. Inserção de Dados (`INSERT`)
 
