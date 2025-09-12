@@ -560,7 +560,7 @@ CREATE TABLE tb_atendimento (
 >👉 Cada linha dentro da tabela define um atributo (coluna).
 >👉 As chaves estrangeiras (FOREIGN KEY) criam relações entre as entidades.
 
-> ‼️ Caso houver estranhamento acerca das nomeclaturas utilizadas, acesse o documento :
+> ‼️ Caso houver estranhamento acerca das nomeclaturas utilizadas, acesse o documento :[📊Significado dos campos das tabelas indicadas .pdf]([./caminho/do/arquivo.pdf](https://github.com/GabryelleDart/How-To-Do-Python-Postgree-Integration/blob/main/Significado%20dos%20campos%20das%20tabelas%20indicadas%20.pdf))
 #### 2️⃣ Usando pgAdmin (interface gráfica)
    1. Abra o pgAdmin.
    2. Clique em Databases → Seu banco → Schemas → Tables.
@@ -652,25 +652,30 @@ CREATE TABLE tb_unidade_saude (
 #### 🔹 2. Usando pgAdmin (Interface Gráfica)
 
 1. Abra o pgAdmin e conecte ao seu banco de dados.
+
 2. No painel lateral, vá até Schemas → Tables.
 
-Clique com o botão direito na tabela que vai receber a chave estrangeira (ex.: tb_unidade_saude).
+3. Clique com o botão direito na tabela que vai receber a chave estrangeira (ex.: tb_unidade_saude).
 
-Selecione Properties → Constraints → Foreign Keys.
+<img width="1919" height="1016" alt="Captura de tela 2025-09-11 220240" src="https://github.com/user-attachments/assets/464e60f1-9b30-4082-ab98-03d01520cb30" />
 
-Clique em + para adicionar uma nova foreign key.
+4. Selecione Properties → Constraints → Foreign Keys.
 
-Configure:
+5. Clique em + para adicionar uma nova foreign key.
 
-Nome da constraint (ex.: fk_tipo_unidade)
+6. Configure:
+   
+- Nome da constraint (ex.: fk_tipo_unidade)
+  
+- Coluna da tabela atual (ex.: co_tipo_unidade)
+  
+- Tabela de referência (ex.: dim_tipo_unidade)
+  
+- Coluna de referência (ex.: co_seq_tipo_unidade)
+  
+<img width="1919" height="1010" alt="image" src="https://github.com/user-attachments/assets/352950a1-9037-4163-b1a2-785719abd51d" />
 
-Coluna da tabela atual (ex.: co_tipo_unidade)
-
-Tabela de referência (ex.: dim_tipo_unidade)
-
-Coluna de referência (ex.: co_seq_tipo_unidade)
-
-Clique em Save.
+7. Clique em Save.
 
 **📌 O pgAdmin vai gerar automaticamente o comando SQL equivalente.**
 
@@ -688,7 +693,9 @@ Como usar:
 5. Clique em Generate SQL → Run para aplicar no banco.
 
 📌 Vantagem: Muito bom para quem prefere trabalhar visualmente.
+
 📌 Desvantagem: Menos controle fino do que escrever SQL diretamente.
+
 ----
 
 
@@ -969,6 +976,21 @@ WHERE
 ORDER BY
     a.dt_atendimento;
 ```
+
+
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+
+
+
+
+
+
+
 
 ## 🔗 Conectar Python ao PostgreSQL e Executar Consultas
 
