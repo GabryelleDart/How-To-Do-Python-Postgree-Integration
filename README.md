@@ -409,6 +409,7 @@ GRANT ALL PRIVILEGES ON DATABASE meu_projeto TO meu_usuario;
 <img width="1915" height="1002" alt="image" src="https://github.com/user-attachments/assets/192a612d-8526-4204-8819-21b8d77b4fa3" />
 
 **Passo 4:** Salve.
+
 ---
 
 
