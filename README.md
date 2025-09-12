@@ -408,6 +408,7 @@ GRANT ALL PRIVILEGES ON DATABASE meu_projeto TO meu_usuario;
 
 <img width="1915" height="1002" alt="image" src="https://github.com/user-attachments/assets/192a612d-8526-4204-8819-21b8d77b4fa3" />
 
+**Passo 4:** Salve.
 ---
 
 
@@ -601,11 +602,27 @@ CREATE TABLE tb_atendimento (
 ## 🗂️ Modelar Relações entre as Tabelas no PostgreSQL
 
 ### 📖 O que significa modelar relações?
+Modelar relações é definir como tabelas diferentes de um banco de dados se conectam.
+➡️ No mundo real:
+- Um paciente pode ter vários atendimentos.
+- Um hospital pode atender vários pacientes.
+- Cada atendimento está ligado a um paciente e a um hospital.
+
+No banco de dados, essas conexões são chamadas de relacionamentos.
 
 ### 🧩 Tipos de Relacionamentos
-### 📊 Métodos para modelar relações
+| Tipo | Entidade 1 | Cardinalidade | Entidade 2 | Exemplo |
+|------|------------|---------------|------------|---------|
+| **1:1** | `paciente` | `1` ─── `1` | `documento` | Um paciente tem um único CPF |
+| **1:N** | `dim_tipo_unidade` | `1` ─── `N` | `tb_unidade_saude` | Um tipo tem várias unidades |
+| **1:N** | `dim_sexo` | `1` ─── `N` | `tb_paciente` | Um sexo tem vários pacientes |
+| **1:N** | `tb_paciente` | `1` ─── `N` | `tb_atendimento` | Um paciente tem vários atendimentos |
+| **1:N** | `tb_unidade_saude` | `1` ─── `N` | `tb_atendimento` | Uma unidade tem vários atendimentos |
+| **N:N** | `tb_paciente` | `N` ─── `N` | `tb_medico` | Pacientes ↔ Médicos |
 
-####🔹 1. Via SQL (padrão e mais usado)
+### 📊 Métodos para modelar relações
+Existem várias formas de criar relações entre tabelas no PostgreSQL. Vamos ver todas:
+#### 🔹 1. Via SQL (padrão e mais usado)
 
 O jeito mais direto é escrever os comandos SQL que criam as chaves estrangeiras (FOREIGN KEYS).
 Exemplo:
@@ -631,10 +648,9 @@ CREATE TABLE tb_unidade_saude (
 ** 📌 Vantagem: mais flexível, você escreve exatamente o que precisa.**
 ** 📌 Desvantagem: precisa conhecer SQL.**
 
-####🔹 2. Usando pgAdmin (Interface Gráfica)
+#### 🔹 2. Usando pgAdmin (Interface Gráfica)
 
 1. Abra o pgAdmin e conecte ao seu banco de dados.
-
 2. No painel lateral, vá até Schemas → Tables.
 
 Clique com o botão direito na tabela que vai receber a chave estrangeira (ex.: tb_unidade_saude).
@@ -657,25 +673,18 @@ Clique em Save.
 
 **📌 O pgAdmin vai gerar automaticamente o comando SQL equivalente.**
 
-####🔹 3. Usando Diagramas ERD no pgAdmin
+#### 🔹 3. Usando Diagramas ERD no pgAdmin
 
 O pgAdmin tem uma ferramenta chamada ERD Tool (Entity-Relationship Diagram), que permite criar relações arrastando e soltando.
 
 Como usar:
 
-Abra o pgAdmin.
-
-Vá em Tools → ERD Tool.
-
-Adicione as tabelas que já existem no banco.
-
-Clique em uma coluna e arraste até a coluna da tabela relacionada.
-
-Exemplo: arraste co_tipo_unidade de tb_unidade_saude até co_seq_tipo_unidade de dim_tipo_unidade.
-
-O pgAdmin gera o relacionamento visualmente e o SQL correspondente.
-
-Clique em Generate SQL → Run para aplicar no banco.
+1. Abra o pgAdmin.
+2. Vá em Tools → ERD Tool.
+3. Adicione as tabelas que já existem no banco.
+4. Clique em uma coluna e arraste até a coluna da tabela relacionada.
+> O pgAdmin gera o relacionamento visualmente e o SQL correspondente.
+5. Clique em Generate SQL → Run para aplicar no banco.
 
 📌 Vantagem: Muito bom para quem prefere trabalhar visualmente.
 📌 Desvantagem: Menos controle fino do que escrever SQL diretamente.
@@ -698,8 +707,59 @@ Clique em Generate SQL → Run para aplicar no banco.
 
 ## 🗂️ Criar o esquema do Banco de Dados
 
---
+### 📖 O que é um esquema?
+Um esquema no PostgreSQL é como uma pasta dentro do banco de dados.
+- Ele organiza tabelas, visões, funções e outros objetos.
+- Permite separar diferentes partes de um sistema dentro do mesmo banco.
 
+➡️ Por padrão, o PostgreSQL cria o esquema chamado `public`, onde tudo é armazenado.
+➡️ Mas, em projetos reais, é comum criar esquemas separados (ex.: `clinica`, `financeiro`, `usuarios`) para organizar melhor.
+
+🎯 Por que usar esquemas?
+
+- Organização → Evita confusão em projetos grandes.
+- Segurança → Permite dar permissões diferentes por esquema.
+- Reuso → Dá para ter tabelas com o mesmo nome em esquemas diferentes.
+
+> **👉 OBSERVAÇÃO:** Se você não especificar um esquema, o PostgreSQL usa automaticamente o `public`.
+Exemplo: 
+- `clinica.tb_paciente`
+- `financeiro.tb_paciente`
+> Mesmo nome, mas em contextos diferentes.
+
+### 📖 Como criar esquemas no PostgreSQL
+
+#### 🔹 1. Criar esquema via SQL
+O comando básico é:
+```sql
+CREATE SCHEMA nome_do_esquema;
+```
+Exemplo:
+```sql
+CREATE SCHEMA clinica;
+```
+Logo, todas as tabelas da clínica podem ser criadas assim:
+```sql
+CREATE TABLE clinica.tb_paciente (
+    id BIGSERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL
+);
+```
+> 🍭 É possível definir qual esquema será usado por padrão quando o usuário logar. Por meio do código `ALTER USER meu_usuario SET search_path TO clinica;`
+
+##### 👁️ Como ver esquemas existentes?
+Execute dentro do psql:
+```sql
+\dn
+```
+### 🔹 2. Criar esquema via pgAdmin
+1. Abra o pgAdmin.
+2. No painel lateral, expanda o banco de dados.
+3. Clique em Schemas → Create → Schema.
+<img width="1919" height="1013" alt="Captura de tela 2025-09-11 212554" src="https://github.com/user-attachments/assets/9ab71a67-a725-48d6-b0ac-c008c9040bfb" />
+4. Dê um nome (ex.: clinica).
+<img width="1919" height="1014" alt="image" src="https://github.com/user-attachments/assets/329ba02a-5efb-4a15-8c4f-2353a6b12102" />
+5. Clique em Save.
 
 &nbsp;<br>
 &nbsp;<br>
