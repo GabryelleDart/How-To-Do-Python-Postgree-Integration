@@ -7,7 +7,12 @@
 ## 📖 Sobre o Projeto
 Este repositório tem como objetivo ajudar você a:  
 ✅ Entender o que é o **PostgreSQL**  
-✅  
+✅ Aprender como **instalar e configurar** o banco de dados em diferentes sistemas operacionais  
+✅ Criar um **banco de dados seguro**, com usuário próprio para cada aplicação  
+✅ Definir **entidades e atributos** de um sistema real (exemplo: gestão de saúde)  
+✅ Modelar **relacionamentos entre tabelas** no PostgreSQL  
+✅ Construir o **esquema do banco de dados** de forma organizada  
+✅ Integrar o **Python com PostgreSQL** utilizando bibliotecas como `psycopg2`  
 
 ---
 ## 🐘 O que é o PostgreSQL?
@@ -33,7 +38,14 @@ Isso significa que ele armazena informações em **tabelas organizadas**, permit
 
 ## ⚙️ Estrutura do Projeto
 📂 Aqui você encontrará:  
+   - 📖 **Documentação teórica** → explicações sobre PostgreSQL, instalação e conceitos          básicos.  
+   - 🗂️ **Scripts SQL** → arquivos prontos para criar usuários, bancos e esquemas no             PostgreSQL.  
+   - 🐍 **Exemplos em Python** → conexão com PostgreSQL, execução de queries e boas práticas. 
+   - 📊 **Modelagem de dados** → entidades, atributos e relacionamentos representados em SQL      e diagramas.  
+   - 🔐 **Configurações de segurança** → como proteger seu banco com acesso local seguro.  
+   - 📁 **Exemplos práticos** → simulação de um sistema de saúde para aplicar todos os            conceitos.  
 
+> 💡 Assim, o repositório serve tanto como **material de estudo** quanto como **base inicial** para novos projetos que integrem Python + PostgreSQL.  
 
 ---
 
